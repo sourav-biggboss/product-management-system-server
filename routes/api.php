@@ -3,6 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\ProfileController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -19,4 +20,9 @@ Route::controller(AuthController::class)->group(function () {
     Route::post('register', 'register');
     Route::post('logout', 'logout');
     Route::post('refresh', 'refresh');
+});
+Route::prefix('profile')->name('profile.')->controller(ProfileController::class)->group(function (){
+    Route::get('edit/{id?}','edit')->whereNumber('id');
+    Route::put('update/{id?}','update')->whereNumber('id');
+    Route::delete('delete/{id?}','destory')->whereNumber('id');
 });
