@@ -21,8 +21,11 @@ Route::controller(AuthController::class)->group(function () {
     Route::post('logout', 'logout');
     Route::post('refresh', 'refresh');
 });
-Route::prefix('profile')->name('profile.')->controller(ProfileController::class)->group(function (){
-    Route::get('edit/{id?}','edit')->whereNumber('id');
-    Route::put('update/{id?}','update')->whereNumber('id');
-    Route::delete('delete/{id?}','destory')->whereNumber('id');
+
+Route::middleware('auth:api')->group(function (){
+    Route::prefix('profile')->name('profile.')->controller(ProfileController::class)->group(function (){
+        Route::get('edit/{id?}','edit')->whereNumber('id');
+        Route::put('update/{id?}','update')->whereNumber('id');
+        Route::delete('delete/{id?}','destory')->whereNumber('id');
+    });
 });

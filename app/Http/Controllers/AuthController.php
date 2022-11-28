@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use App\Models\User;
+use App\Models\Employee;
 
 class AuthController extends Controller
 {
@@ -48,6 +49,7 @@ class AuthController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:6',
+            'number' => 'required|numeric|unique:employees',
         ]);
 
         $user = User::create([
@@ -60,6 +62,7 @@ class AuthController extends Controller
         $emp->user_id = $user->id;
         $emp->name = $request->name;
         $emp->email = $request->email;
+        $emp->number = $request->number;
         $emp->save();
 
         $token = Auth::login($user);

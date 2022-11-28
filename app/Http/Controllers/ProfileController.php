@@ -19,11 +19,11 @@ class ProfileController extends Controller
      */
     public function edit(int $id =null)
     {
-        if ($id) {
-            dd($id = Auth::user());
+        if ($id == null) {
+            $id =  Auth::user()->id;
         }
-        // dd(Auth::user());
-
+        
+        // echo $id;
         return User::select([
             'users.name',
             'users.email',
@@ -47,14 +47,15 @@ class ProfileController extends Controller
      */
     public function update(Request $request,int $id = null)
     {
+        // return $request->all();
         if ($id == null) {
             $id = Auth::user()->id;
         }
 
         $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users',
-            'number' => 'required|regex:/(01)[0-9]{9}/unique:users',
+            'email' => 'required|string|email|max:255',
+            'number' => 'required|numeric',
             'salary' => 'required|numeric',
             'address' => 'required|string',
             'department_id' => 'required|numeric',
@@ -66,21 +67,22 @@ class ProfileController extends Controller
         $user->email = $request->email;
         $user->password = Hash::make($request->password);
 
-        $emp = Employee::findOrFail($user->id);
+        $emp = Employee::where('user_id',$user->id)->first();
         $emp->name = $request->name;
         $emp->email = $request->email;
         $emp->number = $request->number;
         $emp->salary = $request->salary;
         $emp->roll = $request->roll;
+        $emp->address = $request->address;
         if ($request->file('cv')) {
             $emp->cv_path = $request->file('cv')->store('user_cv');
         }
+
         if ($request->file('photo')) {
             $emp->photo_path = $request->file('photo')->store('user_photo');
         }
         $emp->department_id = $request->department_id;
-
-        if (!user->save() || !$emp->save()) {
+        if (!$user->save() || !$emp->save()) {
             return response()->json([
                 'status' => 'failed'
             ]);
