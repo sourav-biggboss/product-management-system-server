@@ -38,11 +38,13 @@ class DepartmentController extends Controller
     {
 
         $request->validate([
-            'name' => 'required|string|max:255|unique:departments'
+            'name' => 'required|string|max:255|unique:departments',
+            'description' => 'string|max:255',
         ]);
 
         $department = new Department;
         $department->name = $request->name;
+        $department->description = $request->description;
         if (!$department->save()) {
             return response()->json([
                 'status' => 'failed'
@@ -64,11 +66,13 @@ class DepartmentController extends Controller
     {
 
         $request->validate([
-            'name' => 'required|string|max:255|unique:departments'
+            'name' => 'required|string|max:255',
+            'description' => 'string|max:255',
         ]);
 
         $department = Department::findOrFail($id);
         $department->name = $request->name;
+        $department->description = $request->description;
         if (!$department->save()) {
             return response()->json([
                 'status' => 'failed'
