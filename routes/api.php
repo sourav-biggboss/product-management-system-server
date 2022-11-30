@@ -6,6 +6,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\CommonApiController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -41,6 +42,12 @@ Route::middleware('auth:api')->group(function (){
 
     Route::prefix('notification')->name('notification.')->controller(NotificationController::class)->group(function (){
         Route::get('index/{id?}','index')->whereNumber('id')->name('index');
+        Route::post('create','create')->name('create');
+    });
+
+    Route::prefix('common-api')->name('common-api.')->controller(CommonApiController::class)->group(function (){
+        Route::post('index/{model}','index')->name('index');
+        Route::post('count/{model}','count')->name('count');
         Route::post('create','create')->name('create');
     });
 

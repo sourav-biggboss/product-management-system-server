@@ -15,13 +15,18 @@ class DepartmentController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function index(int $id = null)
+    public function index(Request $request,int $id = null)
     {
 
         $departments = Department::select('*');
         
         if ($id != null) {
             $departments = $departments->where('id',$id);
+        }
+        if ($request->offset && $request->limit) {
+            $departments = $departments->skip($request->offset)->take($request->limit);
+        } else {
+            $departments = $departments->skip(0)->take(30);
         }
         return $departments->get();
     }
