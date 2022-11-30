@@ -13,11 +13,15 @@ class CommonApiController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index(Request $request,string $model)
+    public function index(Request $request,string $model,int $offset = 0)
     {
         $modelData = DB::table($model);
 
-        return $request->all();
+        if ($request->all() && count($request->all()) > 0) {
+            $modelData = $modelData->where($request->all());
+        }
+
+        return $request->take($offset)->take(30)->get();
 
     }
 
@@ -26,9 +30,24 @@ class CommonApiController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create()
+    public function create(Request $request,string $model)
     {
-        //
+        $modelData = DB::table($model);
+
+        if (!($request->all() && count($request->all()) > 0)) {
+            return response()->json([
+                'status' => 'failed'
+            ]);
+        }
+        $modelData = $modelData->create($request->all());
+        if (!$modelData) {
+            return response()->json([
+                'status' => 'failed'
+            ]);
+        }
+        return response()->json([
+            'status' => 'success'
+        ]);
     }
 
     /**
@@ -46,31 +65,10 @@ class CommonApiController extends Controller
         }
         $modelData = $modelData->count();
         return response()->json([
-            'total' =>  $modelData 
+            'count' =>  $modelData 
         ]) ;
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
-    {
-        //
-    }
 
     /**
      * Update the specified resource in storage.
@@ -79,9 +77,24 @@ class CommonApiController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request,string $model,int $id)
     {
-        //
+        $modelData = DB::table($model)->where('id',$id);
+
+        if (!($request->all() && count($request->all()) > 0)) {
+            return response()->json([
+                'status' => 'failed'
+            ]);
+        }
+        $modelData = $modelData->update($request->all());
+        if (!$modelData) {
+            return response()->json([
+                'status' => 'failed'
+            ]);
+        }
+        return response()->json([
+            'status' => 'success'
+        ]);
     }
 
     /**
@@ -90,8 +103,16 @@ class CommonApiController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(Request $request,string $model,int $id)
     {
-        //
+        $modelData = DB::table($model)->where('id',$id)->delete();
+        if (!$modelData) {
+            return response()->json([
+                'status' => 'failed'
+            ]);
+        }
+        return response()->json([
+            'status' => 'success'
+        ]);
     }
 }

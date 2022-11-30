@@ -23,6 +23,9 @@ class DepartmentController extends Controller
         if ($id != null) {
             $departments = $departments->where('id',$id);
         }
+        if ($request->search) {
+            $departments = $departments->where('name','like','%'.$request->search.'%');
+        }
         if ($request->offset && $request->limit) {
             $departments = $departments->skip($request->offset)->take($request->limit);
         } else {

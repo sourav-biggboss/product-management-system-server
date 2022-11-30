@@ -46,9 +46,11 @@ Route::middleware('auth:api')->group(function (){
     });
 
     Route::prefix('common-api')->name('common-api.')->controller(CommonApiController::class)->group(function (){
-        Route::post('index/{model}','index')->name('index');
-        Route::post('count/{model}','count')->name('count');
-        Route::post('create','create')->name('create');
+        Route::get('index/{model}/{offset?}','index')->whereAlpha('model')->whereNumber('offset')->name('index');
+        Route::get('count/{model}','count')->whereAlpha('model')->name('count');
+        Route::post('create/{model}','create')->whereAlpha('model')->name('create');
+        Route::put('update/{model}/{id}','update')->whereAlpha('model')->whereNumber('id')->name('update');
+        Route::delete('delete/{model}/{id}','destroy')->whereAlpha('model')->whereNumber('id')->name('delete');
     });
 
 });
