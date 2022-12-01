@@ -19,7 +19,9 @@ class ProfileController extends Controller
      */
     public function edit(int $id =null)
     {
-        
+        if ($id == null) {
+            $id = Auth::user()->id;
+        }
         
         // echo $id;
         return User::select([
