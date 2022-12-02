@@ -29,6 +29,8 @@ Route::middleware('auth:api')->group(function (){
 
     Route::prefix('profile')->name('profile.')->controller(ProfileController::class)->group(function (){
         Route::get('edit/{id?}','edit')->whereNumber('id');
+        Route::post('create','create')->name('create');
+        Route::get('index/{id?}','index')->whereNumber('id')->name('index');
         Route::put('update/{id?}','update')->whereNumber('id');
         Route::delete('delete/{id?}','destory')->whereNumber('id');
     });
