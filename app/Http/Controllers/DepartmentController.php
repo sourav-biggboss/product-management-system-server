@@ -23,14 +23,31 @@ class DepartmentController extends Controller
         if ($id != null) {
             $departments = $departments->where('id',$id);
         }
-        if ($request->search) {
-            $departments = $departments->where('name','like','%'.$request->search.'%');
+        
+        $filter = json_decode($request->input('filter'));
+
+        if (isset($filter->search) && $filter->search != null && $filter->search != '') {
+            $departments = $departments->where('name','like','%'.$filter->search.'%');
+        }
+
+        if (isset($filter->fromDate) && $filter->toDate && $filter->fromDate != null && $filter->fromDate != '' && $filter->toDate != null && $filter->toDate != '') {
+            $departments = $departments->whereBetween('created_at',[$filter->fromDate,$filter->toDate]);
+        }
+
+        if (isset($filter->withTrash) && $filter->withTrash != null && $filter->withTrash != '') {
+            $departments = $departments->withTrash();
+        }
+        if (isset($filter->orderBy) && $filter->orderBy == 'asc') {
+            $departments = $departments->orderBy('id',$filter->orderBy);
+        } else {
+            $departments = $departments->orderBy('id','desc');
         }
         if ($request->offset && $request->limit) {
             $departments = $departments->skip($request->offset)->take($request->limit);
         } else {
             $departments = $departments->skip(0)->take(30);
         }
+        
         return $departments->get();
     }
 
