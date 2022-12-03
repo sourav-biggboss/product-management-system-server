@@ -61,7 +61,8 @@ class ProfileController extends Controller
             'employees.address',
             'employees.cv_path',
             'employees.department_id',
-        ])->leftJoin('employees','employees.user_id','=','users.id');
+            'departments.name as department_name',
+        ])->leftJoin('employees','employees.user_id','=','users.id')->leftJoin('departments','departments.id','=','employees.department_id');
 
         if ($id != null) {
             $users = $users->where('users.id',$id);
@@ -71,6 +72,10 @@ class ProfileController extends Controller
 
         if (isset($filter->search) && $filter->search != null && $filter->search != '') {
             $users = $users->where('users.name','like','%'.$filter->search.'%');
+        }
+
+        if (isset($filter->department_id) && $filter->department_id != null && $filter->department_id != '') {
+            $users = $users->where('employees.department_id',$filter->department_id);
         }
 
         if (isset($filter->fromDate) && $filter->toDate && $filter->fromDate != null && $filter->fromDate != '' && $filter->toDate != null && $filter->toDate != '') {
@@ -159,9 +164,8 @@ class ProfileController extends Controller
         if ($id == null) {
             $id = Auth::user()->id;
         }
-
         if(
-            (!Employee::find($id)->delete()) ||
+            (!Employee::where('user_id',$id)->delete()) ||
             (!User::find($id)->delete())
         ){
             return response()->json([
@@ -173,7 +177,7 @@ class ProfileController extends Controller
         ]);
     }
 
-        /**
+    /**
      * Create the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
@@ -201,7 +205,7 @@ class ProfileController extends Controller
         $user->save();
 
         $emp = new Employee;
-        $emp->name = $user->id;
+        $emp->user_id = $user->id;
         $emp->name = $request->name;
         $emp->email = $request->email;
         $emp->number = $request->number;
@@ -224,5 +228,21 @@ class ProfileController extends Controller
         return response()->json([
             'status' => 'success'
         ]);
+    }
+
+    /**
+     * It fetches a user with the given id and joins the department table to the user table.
+     * 
+     * @param int id The id of the user you want to fetch
+     * 
+     * @return App/Models/User
+     */
+    public function fetchUserWithDepartment(int $id)
+    {
+        return response()->json(User::where('users.id'.$id)->leftJoin('employees','employees.user_id','=','users.id')->leftJoin('departments','departments.id','=','employees.department_id')->select([
+            'users.*',
+            'departments.name as department_name',
+            'departments.description as department_description'
+        ])->first());
     }
 }
